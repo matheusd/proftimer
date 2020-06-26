@@ -49,6 +49,16 @@ func Accum(names ...string) {
 	}
 }
 
+// Reset removes the named timers, effectively cleaning up after them.
+func Reset(names ...string) {
+	mu.Lock()
+	defer mu.Unlock()
+
+	for _, name := range names {
+		delete(timers, name)
+	}
+}
+
 // Event increases the event count on all named timers. Inexistant timers are
 // ignored.
 func Event(names ...string) {
