@@ -3,6 +3,7 @@ package proftimer
 import (
 	"fmt"
 	"io"
+	"sort"
 	"sync"
 	"time"
 )
@@ -85,10 +86,19 @@ func report(name string, w io.Writer) {
 	fmt.Fprintf(w, "%20s: %s\n", name, t.total)
 }
 
-// Report all the given timers to the given io writer.
+// Report all the given timers to the given io writer. If no names are specified,
+// all timers are reported.
 func Report(w io.Writer, names ...string) {
 	mu.Lock()
 	defer mu.Unlock()
+
+	if len(names) == 0 {
+		names = make([]string, 0, len(timers))
+		for n := range timers {
+			names = append(names, n)
+		}
+		sort.Slice(names, func(i, j int) bool { return names[i] < names[j] })
+	}
 
 	for _, name := range names {
 		report(name, w)
